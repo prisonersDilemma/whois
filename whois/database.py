@@ -1,10 +1,10 @@
 #!/usr/bin/env python3.6
-"""
-Create an sqlite3 database, table, or insert records.
-"""
-
+"""Create an sqlite3 database, table, or insert records."""
+from logging import getLogger
 from os.path import basename, splitext
 from sqlite3 import connect
+
+logger = getLogger(__name__)
 
 def create_database(fpath):
     with connect(fpath) as conn:
@@ -19,11 +19,15 @@ def conn_and_exec(**kwargs):
         c.execute(stmt, vals)                        # Execute the SQL statement
         conn.commit()                                # Saves changes.
 
+
 def create_table(dbpath, keys, name=None):
     name = name if name else gettablename(dbpath)
     cols = ' text, '.join(keys) + ' text'
     sql_stmt = 'CREATE TABLE IF NOT EXISTS ' + name + ' (' + cols + ')'
     conn_and_exec(file=dbpath, stmt=sql_stmt)
+    # Put this in database.
+    logger.info(f'table {name} created if it does not exist.')
+
 
 def insert_record(dbpath, values, name=None):
     name = name if name else gettablename(dbpath)
