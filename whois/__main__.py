@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 __date__ = '2017-11-15'
-__version__ = (0,1,2)
+__version__ = (0,1,3)
 
 from logging import basicConfig, getLevelName, getLogger
 from re import sub
@@ -96,6 +96,7 @@ if __name__ == '__main__':
             try:
                 name, cntry = name_cntry.rsplit(',', 1)
                 name = sub(r'(, |,)', ' - ', name)
+                cntry = cntry.lstrip(' ') # removes a leading whitespace
             except ValueError:
                 logger.warning(f'Exception raised parsing `nacat` output for '
                                f'secondary values "name", "cntry":\n{line}\n'
@@ -182,3 +183,4 @@ if __name__ == '__main__':
 # * Added cp + chown + chgrp of daily_list to ADMIN
 # * Added a __main__ and other small changes. Added a temp fix to copy
 #   daily-list to admin.
+# * Fixed leading whitespace character on the beginning of values for 'COUNTRY'.
