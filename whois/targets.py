@@ -5,7 +5,7 @@ dictionary whose keys are the IP addresses found on the given date, and values
 are dictionaries with a timestamp key and value.
 """
 __date__ = '2017-11-15'
-__version__ = (0,0,4)
+__version__ = (0,0,5)
 
 
 from logging import getLogger
@@ -41,7 +41,7 @@ def gettargets(logfile, trgtdate, nlines, bufsz, newline):
             # happen at the header. Otherwise, the header may raise an error
             # when we call group().
 
-            dateptrns = yyyymmdd.date(line) # re.match object
+            dateptrns = yyyymmdd.yyyymmdd_in(line) # re.match object
 
             # We must finish the chunk before we can return. The lines in each
             # chunk are in order, but the chunks are in reverse order.

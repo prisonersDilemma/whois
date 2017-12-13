@@ -1,17 +1,18 @@
 #!/usr/bin/env python3.6
 __date__ = '2017-11-15'
-__version__ = (0,1,3)
+__version__ = (0,2,0)
 
 from logging import basicConfig, getLevelName, getLogger
 from re import sub
 from os import getcwd #testing
-from os import mkdir
+from os import mkdir, sys
 from os.path import basename, exists, expanduser, join
 from subprocess import run
 from . import PKGPATH # Python free module-level variable, available to __init__.
 from . import argparser
 from . import database
 from . import nacat
+from . import query
 from . import targets
 import offset
 import tail
@@ -21,6 +22,10 @@ import yyyymmdd
 if __name__ == '__main__':
 
     opts = argparser.parse_args()
+    #print(opts)
+    if opts.query: # list of args
+        query.main(opts.query)
+    sys.exit(0)
 
 
     # Configure and Initialize the logger.
@@ -58,8 +63,13 @@ if __name__ == '__main__':
     # Main program logic.
     #===============================================================================
 
+    #if opts.cmd
+    # Handle queries, or do parsing.
+    #query.n_results_by_daterange()
+
+
     # Assemble targets dict from the Splunk log.
-    trgts = targets.gettargets( opts.log_file, opts.date, opts.nlines, opts.bufsz, opts.newline)
+    trgts = targets.gettargets(opts.log_file, opts.date, opts.nlines, opts.bufsz, opts.newline)
     logger.info(f'trgts found: {len(trgts)}') # done in gettargets
 
 
@@ -96,6 +106,7 @@ if __name__ == '__main__':
             try:
                 name, cntry = name_cntry.rsplit(',', 1)
                 name = sub(r'(, |,)', ' - ', name)
+                name = name.lstrip() # remove a space on the left
                 cntry = cntry.lstrip(' ') # removes a leading whitespace
             except ValueError:
                 logger.warning(f'Exception raised parsing `nacat` output for '
@@ -115,15 +126,23 @@ if __name__ == '__main__':
     # Daily List. Data is changed daily (overwritten). Format data. Append to csv.
     # No header, with following format: name - country,ASN,ipaddr,timestamp
     logger.debug(f'Writing {len(trgts)} lines to daily list file: {opts.list_file}')
-    with open(opts.list_file, mode='w') as f:
-        for trgt in trgts:
-            line = ','.join((trgts[trgt]['name'].lstrip(), # a space on the left...
-                             trgts[trgt]['country'],
-                             trgts[trgt]['ASN'],
-                             trgt,
-                             trgts[trgt]['timestamp']))
-            f.write(f'{line}\n')
 
+    lines = []
+    for trgt in trgts:
+        line = (trgts[trgt]['name'], #.lstrip(), # a space on the left... should be taken care of during parsing.
+                trgts[trgt]['country'],
+                trgts[trgt]['ASN'],
+                trgt,
+                trgts[trgt]['timestamp'])
+
+        lines.append(line)
+
+    # Sort the lines by timestamp (earliest first). Each line is a list of strings.
+    lines.sort(key=lambda x: x[-1])
+
+    with open(opts.list_file, mode='w') as f:
+        # Convert each line (list) to a comma-separated string, ended with a newline.
+        [f.write(','.join(line) + '\n') for line in lines]
 
 
     # If no '.db' extension, append.
@@ -169,18 +188,4 @@ if __name__ == '__main__':
     num_new_targets = len(trgts)
     print(f'{num_new_targets} targets written to {opts.list_file}.')
     print(f'{num_new_targets} added to the database: {opts.database_file}.')
-
-
-##===============================================================================
-# TODO:
-# * Add keyword arg for --date for "yesterday"
-# * Fix if table doesn't exist, make it. If the script runs and errors out,
-#   the database gets created, but not the table. And when re-run, it expects
-#   the table to be created (I guess because the database file exists) and fails
-#   when trying to insert the records.
-#
-# Changelog:
-# * Added cp + chown + chgrp of daily_list to ADMIN
-# * Added a __main__ and other small changes. Added a temp fix to copy
-#   daily-list to admin.
-# * Fixed leading whitespace character on the beginning of values for 'COUNTRY'.
+    sys.exit(0)

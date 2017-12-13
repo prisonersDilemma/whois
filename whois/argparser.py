@@ -1,10 +1,11 @@
 #!/usr/bin/env python3.6
-"""
+__doc__ = """\
 Parse command-line arguments, and options in configuration file(s).
 """
 __date__ = '2017-11-16'
+__version__ = (0,2,1)
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, RawDescriptionHelpFormatter, REMAINDER
 from datetime import datetime
 from logging import getLogger
 from re import sub
@@ -98,6 +99,10 @@ def parse_args():
     parser.add_argument('--port', metavar='INT',
         help='Use the given port when connecting to \033[32;1mhostname\033[0m.')
 
+    # A workaround for a sub-command.
+    parser.add_argument('--query', nargs=REMAINDER,
+        help='query the database')
+
 
     # Display the name like this: 'set[-option]'
     subparsers = parser.add_subparsers(dest='cmd', title='subcommands', metavar='command',
@@ -109,7 +114,7 @@ def parse_args():
         add_help=False,
         parents=[parser],
         help='Make changes permanent by writing them to the configuration file.')
-    set_option.set_defaults(func=set_option)
+    #set_option.set_defaults(func=set_option)
 
     set_option.add_argument('--buffer-size', metavar='INT', dest='bufsz',
         help='Size in bytes (power of 2) to read when tailing \033[32;1mlog-file\033[0m.')
@@ -163,7 +168,7 @@ def parse_args():
 
     # Execute func here, or ignore it by checking the types of all the attrs.
     # Otherwise, we'll get an error when sanitizing the strings.
-    del CONFIGS['func'] # set-option sub-command
+    #del CONFIGS['func'] # set-option sub-command
     #print(CONFIGS)
 
     # Explicitly exclude None values, the defaults, which will "overwrite" the
@@ -179,6 +184,7 @@ def parse_args():
 
     # Parse command-line args.
     args = parser.parse_args()
+    #print(args)
 
     #if args.cmd:
     # Call set-option or init-config
@@ -190,9 +196,9 @@ def parse_args():
 
     # Remove the ArgumentParser object from the Namespace. Run set_option()
     # here. We get the KeyError, only when set-option cmd is not present/used.
-    try: del CONFIGS['func'] # set-option
-    except KeyError:
-        pass
+    #try: del CONFIGS['func'] # set-option
+    #except KeyError:
+    #    pass
 
 
     # Create the Namespace.
@@ -210,6 +216,16 @@ def parse_args():
 
     # Get the date if keyword arg used.
     opts.date = opts.date if opts.date != 'yesterday' else yyyymmdd.yesterday()
+
+
+    # Need this so I can test at the top of __main__ and run the query
+    # sub-command when called, since it will have been removed by now
+    # when it is None. Otherwise, it'll raise an error when it's not called.
+
+    try: opts.query = None if not opts.query else opts.query
+    except AttributeError:
+        opts += ('query', None)
+
 
     return opts
 #===============================================================================

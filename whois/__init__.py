@@ -2,7 +2,8 @@
 
 from . import database
 from . import nacat
+from . import query
 from . import targets
 
-global PKGPATH # Not even sure how global works.
+#global PKGPATH
 PKGPATH = __path__[0]
