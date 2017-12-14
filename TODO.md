@@ -17,3 +17,4 @@
 * Use the sort method for daily-list before inserting to database, too.
 
 * Why doesn't cmd='query' when sub-command is used?
+* Keep query as a separate tool. KISS!

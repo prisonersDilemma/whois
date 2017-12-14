@@ -86,9 +86,9 @@ def n_results_by_daterange(*args, **kwargs):
     top_n = []
     counter = {}
 
-    #print(*args)
-    #print(*kwargs)
-    #return
+    print(*args)
+    print(*kwargs)
+    return
 
     for date in daterange(*args, **kwargs): # kwargs: start, stop, step
         print('date', date)
@@ -119,6 +119,7 @@ def main(args=None):
     args = kwargs.pop('date_range')
     n_results_by_daterange(*args, **kwargs)
 
+    # write out file as: field-date-range-pivot-table.csv
 
 if __name__ == '__main__':
     main(_parse_args())
