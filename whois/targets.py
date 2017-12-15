@@ -25,7 +25,7 @@ def gettargets(logfile, trgtdate, nlines, bufsz, newline):
     the associated timestamp.
     """
     trgts = {}
-    trgtdatecomp = yyyymmdd.DateComp(trgtdate)
+    trgtdatecomp = yyyymmdd.Date(trgtdate)
     finished = False
     nchunks = 0 # How many chunks we've processed.
 
@@ -56,7 +56,7 @@ def gettargets(logfile, trgtdate, nlines, bufsz, newline):
                 finished = True
 
             else:
-                currdatecomp = yyyymmdd.DateComp(dateptrns.group('date'))
+                currdatecomp = yyyymmdd.Date(dateptrns.group('date'))
                 if trgtdatecomp == currdatecomp:
                     ipaddr, tmstmp = line.split(',')
                     ipaddr, tmstmp = ipaddr.strip('"'), tmstmp.rstrip().strip('"')

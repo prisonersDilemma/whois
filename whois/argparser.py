@@ -100,8 +100,8 @@ def parse_args():
         help='Use the given port when connecting to \033[32;1mhostname\033[0m.')
 
     # A workaround for a sub-command.
-    parser.add_argument('--query', nargs=REMAINDER,
-        help='query the database')
+    #parser.add_argument('--query', nargs=REMAINDER,
+    #    help='query the database')
 
 
     # Display the name like this: 'set[-option]'
@@ -222,9 +222,9 @@ def parse_args():
     # sub-command when called, since it will have been removed by now
     # when it is None. Otherwise, it'll raise an error when it's not called.
 
-    try: opts.query = None if not opts.query else opts.query
-    except AttributeError:
-        opts += ('query', None)
+    #try: opts.query = None if not opts.query else opts.query
+    #except AttributeError:
+    #    opts += ('query', None)
 
 
     return opts

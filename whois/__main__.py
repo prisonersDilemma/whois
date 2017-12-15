@@ -12,9 +12,9 @@ from . import PKGPATH # Python free module-level variable, available to __init__
 from . import argparser
 from . import database
 from . import nacat
-from . import query
 from . import targets
 import offset
+import query
 import tail
 import yyyymmdd
 
@@ -23,9 +23,9 @@ if __name__ == '__main__':
 
     opts = argparser.parse_args()
     #print(opts)
-    if opts.query: # list of args
-        query.main(opts.query)
-    sys.exit(0)
+    #if opts.query: # list of args
+    #    query.main(opts.query)
+    #sys.exit(0)
 
 
     # Configure and Initialize the logger.
