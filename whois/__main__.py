@@ -13,8 +13,8 @@ from . import argparser
 from . import database
 from . import nacat
 from . import targets
+from . import query
 import offset
-import query
 import tail
 import yyyymmdd
 
